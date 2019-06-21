@@ -1,7 +1,7 @@
 require("dotenv").config();
+var axios = require("axios");
 var Spotify = require("node-spotify-api");
 var moment = require("moment");
-var axios = require("axios");
 var keys = require("./keys.js");
 var spotify = new Spotify(keys.spotify);
 
@@ -39,8 +39,8 @@ function concertThis() {
                 }
             }
         ).catch(
-            function(error) {
-                console.log(error);
+            function(err) {
+                console.log("Error occurred: " + err);
             }
         )
     } else {
@@ -64,10 +64,16 @@ function spotifyCall(song) {
     }).then(
         function(response) {
             for (var i in response.tracks.items) {
-                console.log("Artist: " + response.tracks.items[i].artists[0].name);
+                for (var j in response.tracks.items[i].artists) {
+                    console.log("Artist: " + response.tracks.items[i].artists[j].name);
+                }
                 console.log("Song Name: " + response.tracks.items[i].name);
                 console.log("Album: " + response.tracks.items[i].album.name);
-                console.log("Song Preview: " + response.tracks.items[i].preview_url);
+                if (response.tracks.items[i].preview_url === null) {
+                    console.log("Song Preview: Not Available");
+                } else {
+                    console.log("Song Preview: " + response.tracks.items[i].preview_url);
+                }
                 console.log("---");
             }
         }
