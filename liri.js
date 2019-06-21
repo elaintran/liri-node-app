@@ -1,5 +1,7 @@
 require("dotenv").config();
 var Spotify = require("node-spotify-api");
+var moment = require("moment");
+var axios = require("axios");
 var keys = require("./keys.js");
 var spotify = new Spotify(keys.spotify);
 
@@ -22,6 +24,59 @@ function commands() {
     }
 }
 commands();
+
+function concertThis() {
+    var queryURL = "https://rest.bandsintown.com/artists/" + process.argv[3] + "/events?app_id=codingbootcamp";
+    if (process.argv[3] !== undefined) {
+        axios.get(queryURL).then(
+            function(response) {
+                for (var i in response.data) {
+                    console.log("Artist: " + process.argv[3]);
+                    console.log("Venue: " + response.data[i].venue.name);
+                    console.log("Location: " + response.data[i].venue.city + ", " + response.data[i].venue.region);
+                    console.log("Event Date: " + moment(response.data[i].datetime).format("MM/DD/YYYY"));
+                    console.log("---");
+                }
+            }
+        ).catch(
+            function(error) {
+                console.log(error);
+            }
+        )
+    } else {
+        console.log("Please input an artist after concert-this.");
+    }
+}
+
+function spotifyThis() {
+    if (process.argv[3] !== undefined) {
+        spotifyCall(process.argv[3]);
+    } else {
+        spotifyCall("The Sign Ace of Base");
+    }
+}
+
+function spotifyCall(song) {
+    spotify.search({
+        type: "track",
+        query: song,
+        limit: 5
+    }).then(
+        function(response) {
+            for (var i in response.tracks.items) {
+                console.log("Artist: " + response.tracks.items[i].artists[0].name);
+                console.log("Song Name: " + response.tracks.items[i].name);
+                console.log("Album: " + response.tracks.items[i].album.name);
+                console.log("Song Preview: " + response.tracks.items[i].preview_url);
+                console.log("---");
+            }
+        }
+    ).catch(function(err) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        }
+    })
+}
 
 // if (process.argv[2] === "concert-this") {
 //     console.log("Name of the venue");
