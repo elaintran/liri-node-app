@@ -164,3 +164,10 @@ function doThis() {
         commands();
     })
 }
+
+//appends the command and value into log.txt
+fs.appendFile("log.txt", process.argv[2] + " " + process.argv[3] + "\n", function(err) {
+    if (err) {
+        return console.log('Error occurred: ' + err);
+    }
+})
